@@ -36,8 +36,9 @@ exports.handler = async (event) => {
       return { statusCode: 401, body: JSON.stringify({ error: 'Invalid credentials' }) };
     }
 
-    // Generate a simple session token (use JWT in production)
-    const token = Buffer.from(`${admin.username}:${Date.now()}:${process.env.ADMIN_SECRET_KEY}`).toString('base64');
+    // Use the ADMIN_SECRET_KEY directly as the session token
+    // verifyAdminAuth() compares this against the stored secret
+    const token = process.env.ADMIN_SECRET_KEY;
 
     // Update last login
     await supabase
