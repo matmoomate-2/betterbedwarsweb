@@ -14,15 +14,19 @@ const API = (() => {
   const FALLBACK_SETTINGS = {
     site_name: 'Better Bedwars',
     hero_title: 'Better Bedwars',
-    hero_subtitle: 'The Ultimate Bedwars Experience',
+    hero_subtitle: 'The Ultimate Bedwars Experience — Enhanced textures, optimized performance, and the competitive edge you need.',
     description: 'A high-quality Minecraft Bedwars texture pack',
     footer_text: '© 2024 Better Bedwars. Not affiliated with Mojang Studios.',
+    server_name: 'Better Bedwars Network',
+    server_ip: 'play.betterbedwars.com',
     discord_url: '#',
     youtube_url: '#',
     github_url: '#',
+    email_contact: 'hello@betterbedwars.com',
     primary_color: '#5c6bc0',
     secondary_color: '#26c6da',
     accent_color: '#ff7043',
+    footer_links: [],
   };
 
   const FALLBACK_PACKS = [
@@ -36,22 +40,98 @@ const API = (() => {
       download_count: 48723,
       featured: true,
       is_published: true,
+      created_at: '2024-06-01T00:00:00Z',
+      screenshots: [],
+    },
+    {
+      id: 'lunar-overlay',
+      name: 'Lunar Overlay',
+      description: 'A clean overlay pack designed to work perfectly with Lunar Client. Enhances your PvP experience without changing too much.',
+      short_description: 'Clean overlay for Lunar Client',
+      category: 'pvp',
+      minecraft_versions: ['1.8.9', '1.19', '1.20'],
+      download_count: 12350,
+      featured: false,
+      is_published: true,
+      created_at: '2024-03-15T00:00:00Z',
+      screenshots: [],
+    },
+    {
+      id: 'faithful-bedwars',
+      name: 'Faithful Bedwars',
+      description: 'A Bedwars version of the classic Faithful pack. Maintains the original Minecraft feel while optimizing for Bedwars.',
+      short_description: 'Classic Faithful for Bedwars',
+      category: 'bedwars',
+      minecraft_versions: ['1.8.9', '1.19', '1.20', '1.21'],
+      download_count: 8921,
+      featured: false,
+      is_published: true,
+      created_at: '2024-01-10T00:00:00Z',
+      screenshots: [],
     }
   ];
 
   const FALLBACK_VERSIONS = [
     {
-      id: 'fallback-v1',
+      id: 'fb-v3',
       pack_id: 'better-bedwars',
       version: '3.0.0',
-      changelog: '## What\'s New in 3.0.0\n- Complete redesign of all armor textures\n- New sword textures with better visibility\n- Optimized all block textures for performance\n- Added support for 1.21',
+      changelog: '## What\'s New in 3.0.0\n- Complete redesign of all armor textures\n- New sword textures with better visibility\n- Optimized all block textures for performance\n- Fixed glass pane connected textures\n- Added support for 1.21',
       file_url: '#',
       file_size: 15728640,
       minecraft_version: '1.8.9 - 1.21',
       is_latest: true,
       downloads: 15234,
-      created_at: new Date().toISOString(),
+      created_at: '2024-06-01T00:00:00Z',
+    },
+    {
+      id: 'fb-v2',
+      pack_id: 'better-bedwars',
+      version: '2.5.0',
+      changelog: '## Changes in 2.5.0\n- Updated hotbar selection indicator\n- New bow pull textures\n- Improved potion color visibility\n- Fixed minor GUI inconsistencies',
+      file_url: '#',
+      file_size: 14680064,
+      minecraft_version: '1.8.9 - 1.20',
+      is_latest: false,
+      downloads: 8921,
+      created_at: '2024-03-20T00:00:00Z',
+    },
+    {
+      id: 'fb-v1',
+      pack_id: 'better-bedwars',
+      version: '2.0.0',
+      changelog: '## Major Update 2.0.0\n- Full 64x resolution upgrade\n- New animated block textures\n- Redesigned UI elements\n- Better crosshair options\n- Performance improvements',
+      file_url: '#',
+      file_size: 12582912,
+      minecraft_version: '1.8.9 - 1.19',
+      is_latest: false,
+      downloads: 24567,
+      created_at: '2024-01-05T00:00:00Z',
     }
+  ];
+
+  const FALLBACK_STAFF = [
+    { id: 's1', name: 'Techno', role: 'Owner', rank: 'Admin', sort_order: 1 },
+    { id: 's2', name: 'DreamWasTaken', role: 'Developer', rank: 'Admin', sort_order: 2 },
+    { id: 's3', name: 'George', role: 'Moderator', rank: 'Mod', sort_order: 3 },
+    { id: 's4', name: 'Sapnap', role: 'Moderator', rank: 'Mod', sort_order: 4 },
+    { id: 's5', name: 'BadBoyHalo', role: 'Helper', rank: 'Helper', sort_order: 5 },
+  ];
+
+  const FALLBACK_RULES = [
+    { id: 'r1', title: 'No Cheating', description: 'Use of hacks, cheats, or unfair modifications is strictly prohibited.', category: 'General', sort_order: 1 },
+    { id: 'r2', title: 'Respect Others', description: 'Treat all players with respect. No harassment, racism, or toxicity.', category: 'General', sort_order: 2 },
+    { id: 'r3', title: 'No Griefing', description: 'Destroying or stealing from other players is not allowed.', category: 'General', sort_order: 3 },
+    { id: 'r4', title: 'No Spamming', description: 'Do not spam chat, advertisements, or inappropriate content.', category: 'Chat', sort_order: 4 },
+    { id: 'r5', title: 'No Hacked Clients', description: 'Using hacked clients or modifications that give unfair advantages is bannable.', category: 'General', sort_order: 5 },
+  ];
+
+  const FALLBACK_FEATURES = [
+    { id: 'f1', title: '24/7 Uptime', description: 'Our servers run around the clock with 99.9% uptime guarantee.', icon: 'server', sort_order: 1 },
+    { id: 'f2', title: 'Anti-Cheat Protection', description: 'Advanced anti-cheat systems keep the game fair for everyone.', icon: 'shield', sort_order: 2 },
+    { id: 'f3', title: 'Dedicated Staff', description: 'Our team is always ready to help with any issues.', icon: 'users', sort_order: 3 },
+    { id: 'f4', title: 'Regular Updates', description: 'New features and improvements added regularly.', icon: 'refresh', sort_order: 4 },
+    { id: 'f5', title: 'Active Community', description: 'Join thousands of active players in our Discord community.', icon: 'discord', sort_order: 5 },
   ];
 
   /**
@@ -225,7 +305,7 @@ const API = (() => {
   }
 
   /**
-   * Get staff members
+   * Get staff members - returns fallback on failure
    */
   async function getStaff() {
     try {
@@ -233,40 +313,40 @@ const API = (() => {
         filters: [{ column: 'is_active', value: true }],
         order: { column: 'sort_order', asc: true },
       });
-      return result || [];
+      return result || FALLBACK_STAFF;
     } catch (error) {
-      console.warn('Staff unavailable:', error.message);
-      return [];
+      console.warn('Staff unavailable, using fallbacks:', error.message);
+      return FALLBACK_STAFF;
     }
   }
 
   /**
-   * Get server rules
+   * Get server rules - returns fallback on failure
    */
   async function getRules() {
     try {
       const result = await supabaseFetch('rules', {
         order: { column: 'sort_order', asc: true },
       });
-      return result || [];
+      return result || FALLBACK_RULES;
     } catch (error) {
-      console.warn('Rules unavailable:', error.message);
-      return [];
+      console.warn('Rules unavailable, using fallbacks:', error.message);
+      return FALLBACK_RULES;
     }
   }
 
   /**
-   * Get server features
+   * Get server features - returns fallback on failure
    */
   async function getServerFeatures() {
     try {
       const result = await supabaseFetch('server_features', {
         order: { column: 'sort_order', asc: true },
       });
-      return result || [];
+      return result || FALLBACK_FEATURES;
     } catch (error) {
-      console.warn('Server features unavailable:', error.message);
-      return [];
+      console.warn('Server features unavailable, using fallbacks:', error.message);
+      return FALLBACK_FEATURES;
     }
   }
 
