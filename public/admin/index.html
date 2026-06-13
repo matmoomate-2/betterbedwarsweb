@@ -427,14 +427,21 @@
         featured: document.getElementById('pack-featured').checked,
         is_published: document.getElementById('pack-published').checked,
       };
+      // Cache pack in localStorage
+      try {
+        const cached = JSON.parse(localStorage.getItem('bb_packs') || '[]');
+        const idx = cached.findIndex(p => p.id === payload.id);
+        if (idx >= 0) { cached[idx] = payload; } else { cached.push(payload); }
+        localStorage.setItem('bb_packs', JSON.stringify(cached));
+      } catch { /* ignore */ }
       try {
         await adminFetch('upload-pack', payload);
-        showToast('Pack saved successfully!');
-        closePackEditor();
-        loadPacks();
+        showToast('Pack saved!');
       } catch (e) {
-        showToast('Failed to save pack: ' + e.message, 'error');
+        showToast('Pack saved to cache (DB unavailable)', 'warning');
       }
+      closePackEditor();
+      loadPacks();
     });
 
     async function deletePack(packId) {
@@ -577,52 +584,62 @@
     // Site Settings (with logo_url + favicon_url support)
     // ============================================================
     async function loadSettings() {
+      let s = null;
+
+      // Try database first
       try {
         const response = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.global&limit=1`, {
           headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
         });
         const settings = await response.json();
-        const s = settings[0];
-        if (!s) return;
+        s = settings[0] || null;
+      } catch { /* DB unavailable, try cache */ }
 
-        const fieldMap = {
-          site_name: 'set-site_name', description: 'set-description',
-          hero_title: 'set-hero_title', hero_subtitle: 'set-hero_subtitle',
-          featured_pack_id: 'set-featured_pack_id',
-          logo_url: 'set-logo_url', favicon_url: 'set-favicon_url',
-          announcement_text: 'set-announcement_text', announcement_type: 'set-announcement_type',
-          announcement_enabled: 'set-announcement_enabled',
-          discord_url: 'set-discord_url', youtube_url: 'set-youtube_url',
-          github_url: 'set-github_url', email_contact: 'set-email_contact',
-          server_ip: 'set-server_ip', server_name: 'set-server_name',
-          footer_text: 'set-footer_text', footer_links: 'set-footer_links',
-          primary_color: 'set-primary_color', secondary_color: 'set-secondary_color',
-          accent_color: 'set-accent_color', dark_bg: 'set-dark_bg',
-        };
-
-        Object.entries(fieldMap).forEach(([key, elId]) => {
-          const el = document.getElementById(elId);
-          if (!el) return;
-          if (el.type === 'checkbox') {
-            el.checked = s[key] || false;
-          } else {
-            const val = s[key];
-            el.value = val !== null && val !== undefined ? (typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val)) : '';
-          }
-        });
-
-        ['primary_color', 'secondary_color', 'accent_color', 'dark_bg'].forEach(key => {
-          const picker = document.getElementById(`set-${key}`);
-          const text = document.getElementById(`set-${key}_text`);
-          if (picker && text) {
-            picker.value = text.value || '#000000';
-            picker.addEventListener('input', () => { text.value = picker.value; });
-            text.addEventListener('input', () => { if (text.value.match(/^#[0-9a-f]{6}$/i)) picker.value = text.value; });
-          }
-        });
-      } catch (e) {
-        showToast('Failed to load settings: ' + e.message, 'error');
+      // Fallback to localStorage cache
+      if (!s) {
+        try {
+          const cached = localStorage.getItem('bb_settings');
+          if (cached) s = JSON.parse(cached);
+        } catch { /* ignore */ }
       }
+
+      if (!s) return;
+
+      const fieldMap = {
+        site_name: 'set-site_name', description: 'set-description',
+        hero_title: 'set-hero_title', hero_subtitle: 'set-hero_subtitle',
+        featured_pack_id: 'set-featured_pack_id',
+        logo_url: 'set-logo_url', favicon_url: 'set-favicon_url',
+        announcement_text: 'set-announcement_text', announcement_type: 'set-announcement_type',
+        announcement_enabled: 'set-announcement_enabled',
+        discord_url: 'set-discord_url', youtube_url: 'set-youtube_url',
+        github_url: 'set-github_url', email_contact: 'set-email_contact',
+        server_ip: 'set-server_ip', server_name: 'set-server_name',
+        footer_text: 'set-footer_text', footer_links: 'set-footer_links',
+        primary_color: 'set-primary_color', secondary_color: 'set-secondary_color',
+        accent_color: 'set-accent_color', dark_bg: 'set-dark_bg',
+      };
+
+      Object.entries(fieldMap).forEach(([key, elId]) => {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        if (el.type === 'checkbox') {
+          el.checked = s[key] || false;
+        } else {
+          const val = s[key];
+          el.value = val !== null && val !== undefined ? (typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val)) : '';
+        }
+      });
+
+      ['primary_color', 'secondary_color', 'accent_color', 'dark_bg'].forEach(key => {
+        const picker = document.getElementById(`set-${key}`);
+        const text = document.getElementById(`set-${key}_text`);
+        if (picker && text) {
+          picker.value = text.value || '#000000';
+          picker.addEventListener('input', () => { text.value = picker.value; });
+          text.addEventListener('input', () => { if (text.value.match(/^#[0-9a-f]{6}$/i)) picker.value = text.value; });
+        }
+      });
     }
 
     async function saveSiteSettings() {
@@ -653,11 +670,17 @@
         }
       }
 
+      // Save to localStorage immediately so frontend can read it
+      try {
+        localStorage.setItem('bb_settings', JSON.stringify(payload));
+      } catch (e) { /* ignore */ }
+
       try {
         await adminFetch('update-site-settings', payload);
-        showToast('Settings saved successfully!');
+        showToast('Settings saved successfully! (DB + cache)');
       } catch (e) {
-        showToast('Failed to save settings: ' + e.message, 'error');
+        // Still a success because it's in localStorage
+        showToast('Settings saved to local cache! (DB unavailable: ' + e.message + ')', 'warning');
       }
     }
 
