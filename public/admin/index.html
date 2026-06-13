@@ -93,6 +93,13 @@
             </div>
             <div class="form-group"><label>Featured Pack ID</label><input type="text" id="set-featured_pack_id" class="form-control" placeholder="e.g. better-bedwars" /></div>
 
+            <!-- Logo / Favicon -->
+            <h3 style="margin: 24px 0 16px;">Branding</h3>
+            <div class="form-row">
+              <div class="form-group"><label>Logo Image URL</label><input type="url" id="set-logo_url" class="form-control" placeholder="https://...logo.png" /><div class="form-hint">Shows in the nav bar (replaces the "BB" icon)</div></div>
+              <div class="form-group"><label>Favicon URL</label><input type="url" id="set-favicon_url" class="form-control" placeholder="https://...favicon.ico" /><div class="form-hint">Browser tab icon (.ico, .png, .svg)</div></div>
+            </div>
+
             <!-- Announcement -->
             <h3 style="margin: 24px 0 16px;">Announcement Banner</h3>
             <div class="form-row">
@@ -127,7 +134,7 @@
             <div class="form-group"><label>Footer Text</label><input type="text" id="set-footer_text" class="form-control" /></div>
             <div class="form-group"><label>Footer Links (JSON array)</label><textarea id="set-footer_links" class="form-control json-editor" placeholder='[{"label":"Privacy","url":"/privacy"},{"label":"Terms","url":"/terms"}]'></textarea><div class="form-hint">JSON array of {label, url} objects</div></div>
 
-            <!-- Branding -->
+            <!-- Branding Colors -->
             <h3 style="margin: 24px 0 16px;">Branding Colors</h3>
             <div class="form-row">
               <div class="form-group"><label>Primary Color</label><div class="color-picker-wrapper"><input type="color" id="set-primary_color" /><input type="text" id="set-primary_color_text" class="form-control" /></div></div>
@@ -245,16 +252,9 @@
   <script>
     const FUNCTIONS_BASE = '/.netlify/functions';
 
-    // ============================================================
-    // 🔑 SUPABASE CONFIG — Replace these with your actual values!
-    // ============================================================
-    // Get these from Supabase: Project Settings → API
     const SUPABASE_URL = 'https://ciyzlhoxwanclkrrsikb.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpeXpsaG94d2FuY2xrcnJzaWtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNDM5NDEsImV4cCI6MjA5NjkxOTk0MX0.lqJaD93lUUEGX2Qp0n5kMKPc5FcotDO_KiwifbpX3TI';
 
-    // ============================================================
-    // Auth
-    // ============================================================
     function getToken() { return localStorage.getItem('bb-admin-token'); }
     function getUser() {
       try { return JSON.parse(localStorage.getItem('bb-admin-user')); } catch { return null; }
@@ -277,17 +277,11 @@
       window.location.href = '/admin/login.html';
     }
 
-    // ============================================================
-    // API helper
-    // ============================================================
     async function adminFetch(functionName, payload = {}) {
       const token = getToken();
       const response = await fetch(`${FUNCTIONS_BASE}/${functionName}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(payload),
       });
       const data = await response.json();
@@ -299,9 +293,7 @@
       const token = getToken();
       const qs = new URLSearchParams(params).toString();
       const url = `${FUNCTIONS_BASE}/${functionName}${qs ? '?' + qs : ''}`;
-      const response = await fetch(url, {
-        headers: { 'Authorization': `Bearer ${token}` },
-      });
+      const response = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Request failed');
       return data;
@@ -317,9 +309,6 @@
       setTimeout(() => toast.remove(), 3000);
     }
 
-    // ============================================================
-    // Tab System
-    // ============================================================
     document.querySelectorAll('[data-tab]').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
@@ -328,9 +317,7 @@
         link.classList.add('active');
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         document.getElementById(`tab-${tab}`).classList.add('active');
-        // Close mobile sidebar
         document.getElementById('admin-sidebar').classList.remove('open');
-        // Load tab data
         if (tab === 'dashboard') loadDashboard();
         if (tab === 'packs') loadPacks();
         if (tab === 'versions') loadVersionsList();
@@ -339,9 +326,6 @@
       });
     });
 
-    // ============================================================
-    // Dashboard
-    // ============================================================
     async function loadDashboard() {
       try {
         const data = await adminGet('get-analytics', { period: '30d' });
@@ -349,13 +333,9 @@
         document.getElementById('stat-period').textContent = (data.period_downloads || 0).toLocaleString();
         document.getElementById('stat-packs').textContent = data.total_packs || 0;
         document.getElementById('stat-versions').textContent = data.total_versions || 0;
-
         const topList = document.getElementById('top-packs-list');
         if (data.top_packs && data.top_packs.length > 0) {
-          topList.innerHTML = `<table class="admin-table">
-            <thead><tr><th>Pack</th><th>Total Downloads</th><th>Period Downloads</th></tr></thead>
-            <tbody>${data.top_packs.map(p => `<tr><td>${p.name}</td><td>${(p.total_downloads || 0).toLocaleString()}</td><td>${(p.period_downloads || 0).toLocaleString()}</td></tr>`).join('')}</tbody>
-          </table>`;
+          topList.innerHTML = `<table class="admin-table"><thead><tr><th>Pack</th><th>Total Downloads</th><th>Period Downloads</th></tr></thead><tbody>${data.top_packs.map(p => `<tr><td>${p.name}</td><td>${(p.total_downloads || 0).toLocaleString()}</td><td>${(p.period_downloads || 0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`;
         } else {
           topList.innerHTML = '<p style="color: var(--text-secondary);">No data available yet.</p>';
         }
@@ -364,9 +344,6 @@
       }
     }
 
-    // ============================================================
-    // Packs Management
-    // ============================================================
     let currentPackId = null;
 
     async function loadPacks() {
@@ -375,27 +352,12 @@
           headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
         });
         const packs = await response.json();
-
         const container = document.getElementById('packs-list');
         if (!packs || packs.length === 0) {
           container.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><h3>No packs yet</h3><p>Create your first texture pack.</p></div>';
           return;
         }
-        container.innerHTML = `<table class="admin-table">
-          <thead><tr><th>Name</th><th>ID</th><th>Category</th><th>Downloads</th><th>Featured</th><th>Published</th><th>Actions</th></tr></thead>
-          <tbody>${packs.map(p => `<tr>
-            <td><strong>${p.name}</strong></td>
-            <td style="color: var(--text-muted); font-size: 0.85rem;">${p.id}</td>
-            <td><span class="badge badge-primary">${p.category || 'other'}</span></td>
-            <td>${(p.download_count || 0).toLocaleString()}</td>
-            <td>${p.featured ? '<span class="admin-badge admin-badge-success">✓</span>' : '—'}</td>
-            <td>${p.is_published ? '<span class="admin-badge admin-badge-success">Published</span>' : '<span class="admin-badge admin-badge-warning">Draft</span>'}</td>
-            <td><div class="admin-actions">
-              <button class="btn btn-secondary btn-sm" onclick="editPack('${p.id}')">✏️</button>
-              <button class="btn btn-secondary btn-sm" onclick="deletePack('${p.id}')" style="color: var(--danger);">🗑</button>
-            </div></td>
-          </tr>`).join('')}</tbody>
-        </table>`;
+        container.innerHTML = `<table class="admin-table"><thead><tr><th>Name</th><th>ID</th><th>Category</th><th>Downloads</th><th>Featured</th><th>Published</th><th>Actions</th></tr></thead><tbody>${packs.map(p => `<tr><td><strong>${p.name}</strong></td><td style="color: var(--text-muted); font-size: 0.85rem;">${p.id}</td><td><span class="badge badge-primary">${p.category || 'other'}</span></td><td>${(p.download_count || 0).toLocaleString()}</td><td>${p.featured ? '<span class="admin-badge admin-badge-success">✓</span>' : '—'}</td><td>${p.is_published ? '<span class="admin-badge admin-badge-success">Published</span>' : '<span class="admin-badge admin-badge-warning">Draft</span>'}</td><td><div class="admin-actions"><button class="btn btn-secondary btn-sm" onclick="editPack('${p.id}')">✏️</button><button class="btn btn-secondary btn-sm" onclick="deletePack('${p.id}')" style="color: var(--danger);">🗑</button></div></td></tr>`).join('')}</tbody></table>`;
       } catch (e) {
         document.getElementById('packs-list').innerHTML = '<p style="color: var(--danger);">Failed to load packs: ' + e.message + '</p>';
       }
@@ -409,7 +371,6 @@
         const packs = await response.json();
         const pack = packs[0];
         if (!pack) { showToast('Pack not found', 'error'); return; }
-
         document.getElementById('pack-modal-title').textContent = `Edit: ${pack.name}`;
         document.getElementById('pack-id').value = pack.id;
         document.getElementById('pack-name').value = pack.name || '';
@@ -452,7 +413,6 @@
       let screenshots = [];
       try { if (screenshotStr) screenshots = JSON.parse(screenshotStr); } catch { screenshots = []; }
       const versions = versionStr ? versionStr.split(',').map(v => v.trim()).filter(Boolean) : [];
-
       const payload = {
         id: document.getElementById('pack-id').value.trim(),
         name: document.getElementById('pack-name').value.trim(),
@@ -467,7 +427,6 @@
         featured: document.getElementById('pack-featured').checked,
         is_published: document.getElementById('pack-published').checked,
       };
-
       try {
         await adminFetch('upload-pack', payload);
         showToast('Pack saved successfully!');
@@ -481,8 +440,6 @@
     async function deletePack(packId) {
       if (!confirm(`Are you sure you want to delete "${packId}"? This cannot be undone.`)) return;
       try {
-        const token = getToken();
-        // Delete via direct REST call (in production use a dedicated function)
         await fetch(`${SUPABASE_URL}/rest/v1/versions?pack_id=eq.${packId}`, {
           method: 'DELETE',
           headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Prefer: 'return=representation' },
@@ -502,9 +459,6 @@
       if (currentPackId) await deletePack(currentPackId);
     }
 
-    // ============================================================
-    // Versions Management
-    // ============================================================
     let currentVersionId = null;
 
     async function loadVersionsList() {
@@ -514,27 +468,11 @@
         });
         const versions = await response.json();
         const container = document.getElementById('versions-list');
-
         if (!versions || versions.length === 0) {
           container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔖</div><h3>No versions yet</h3><p>Add a version to a pack.</p></div>';
           return;
         }
-
-        container.innerHTML = `<table class="admin-table">
-          <thead><tr><th>Pack</th><th>Version</th><th>MC Version</th><th>Size</th><th>Downloads</th><th>Latest</th><th>Actions</th></tr></thead>
-          <tbody>${versions.map(v => `<tr>
-            <td>${v.packs?.name || v.pack_id}</td>
-            <td><strong>${v.version}</strong></td>
-            <td><span class="tag">${v.minecraft_version || '—'}</span></td>
-            <td>${v.file_size ? (v.file_size / 1048576).toFixed(1) + ' MB' : '—'}</td>
-            <td>${v.downloads || 0}</td>
-            <td>${v.is_latest ? '<span class="admin-badge admin-badge-success">Latest</span>' : '—'}</td>
-            <td><div class="admin-actions">
-              <button class="btn btn-secondary btn-sm" onclick="editVersion('${v.id}')">✏️</button>
-              <button class="btn btn-secondary btn-sm" onclick="deleteVersion('${v.id}')" style="color: var(--danger);">🗑</button>
-            </div></td>
-          </tr>`).join('')}</tbody>
-        </table>`;
+        container.innerHTML = `<table class="admin-table"><thead><tr><th>Pack</th><th>Version</th><th>MC Version</th><th>Size</th><th>Downloads</th><th>Latest</th><th>Actions</th></tr></thead><tbody>${versions.map(v => `<tr><td>${v.packs?.name || v.pack_id}</td><td><strong>${v.version}</strong></td><td><span class="tag">${v.minecraft_version || '—'}</span></td><td>${v.file_size ? (v.file_size / 1048576).toFixed(1) + ' MB' : '—'}</td><td>${v.downloads || 0}</td><td>${v.is_latest ? '<span class="admin-badge admin-badge-success">Latest</span>' : '—'}</td><td><div class="admin-actions"><button class="btn btn-secondary btn-sm" onclick="editVersion('${v.id}')">✏️</button><button class="btn btn-secondary btn-sm" onclick="deleteVersion('${v.id}')" style="color: var(--danger);">🗑</button></div></td></tr>`).join('')}</tbody></table>`;
       } catch (e) {
         document.getElementById('versions-list').innerHTML = '<p style="color: var(--danger);">Failed to load versions: ' + e.message + '</p>';
       }
@@ -560,8 +498,7 @@
           headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
         });
         const packs = await response.json();
-        select.innerHTML = '<option value="">Select a pack...</option>' +
-          (packs || []).map(p => `<option value="${p.id}" ${p.id === selectedId ? 'selected' : ''}>${p.name}</option>`).join('');
+        select.innerHTML = '<option value="">Select a pack...</option>' + (packs || []).map(p => `<option value="${p.id}" ${p.id === selectedId ? 'selected' : ''}>${p.name}</option>`).join('');
       } catch {
         select.innerHTML = '<option value="">Error loading packs</option>';
       }
@@ -575,7 +512,6 @@
         const versions = await response.json();
         const v = versions[0];
         if (!v) { showToast('Version not found', 'error'); return; }
-
         document.getElementById('version-modal-title').textContent = `Edit: v${v.version}`;
         await populatePackSelect(v.pack_id);
         document.getElementById('ver-version').value = v.version || '';
@@ -605,12 +541,10 @@
         changelog: document.getElementById('ver-changelog').value.trim(),
         is_latest: document.getElementById('ver-is-latest').checked,
       };
-
       if (!payload.pack_id || !payload.version || !payload.file_url) {
         showToast('Pack, Version, and File URL are required', 'error');
         return;
       }
-
       try {
         await adminFetch('upload-version', payload);
         showToast('Version saved successfully!');
@@ -640,7 +574,7 @@
     }
 
     // ============================================================
-    // Site Settings
+    // Site Settings (with logo_url + favicon_url support)
     // ============================================================
     async function loadSettings() {
       try {
@@ -651,11 +585,11 @@
         const s = settings[0];
         if (!s) return;
 
-        // Populate form fields
         const fieldMap = {
           site_name: 'set-site_name', description: 'set-description',
           hero_title: 'set-hero_title', hero_subtitle: 'set-hero_subtitle',
           featured_pack_id: 'set-featured_pack_id',
+          logo_url: 'set-logo_url', favicon_url: 'set-favicon_url',
           announcement_text: 'set-announcement_text', announcement_type: 'set-announcement_type',
           announcement_enabled: 'set-announcement_enabled',
           discord_url: 'set-discord_url', youtube_url: 'set-youtube_url',
@@ -677,7 +611,6 @@
           }
         });
 
-        // Sync color pickers with text inputs
         ['primary_color', 'secondary_color', 'accent_color', 'dark_bg'].forEach(key => {
           const picker = document.getElementById(`set-${key}`);
           const text = document.getElementById(`set-${key}_text`);
@@ -695,7 +628,8 @@
     async function saveSiteSettings() {
       const fields = [
         'site_name', 'description', 'hero_title', 'hero_subtitle',
-        'featured_pack_id', 'announcement_text', 'announcement_type',
+        'featured_pack_id', 'logo_url', 'favicon_url',
+        'announcement_text', 'announcement_type',
         'discord_url', 'youtube_url', 'github_url', 'email_contact',
         'server_ip', 'server_name', 'footer_text',
         'primary_color', 'secondary_color', 'accent_color', 'dark_bg',
@@ -707,10 +641,8 @@
         if (el) payload[key] = el.value;
       });
 
-      // Checkboxes
       payload.announcement_enabled = document.getElementById('set-announcement_enabled').checked;
 
-      // Footer links - parse JSON
       const footerLinksEl = document.getElementById('set-footer_links');
       if (footerLinksEl) {
         try {
@@ -729,9 +661,6 @@
       }
     }
 
-    // ============================================================
-    // Analytics
-    // ============================================================
     async function loadAnalytics() {
       const period = document.getElementById('analytics-period').value;
       try {
@@ -740,13 +669,9 @@
         document.getElementById('ana-period').textContent = (data.period_downloads || 0).toLocaleString();
         document.getElementById('ana-packs').textContent = data.total_packs || 0;
         document.getElementById('ana-versions').textContent = data.total_versions || 0;
-
         const topContainer = document.getElementById('analytics-top-packs');
         if (data.top_packs && data.top_packs.length > 0) {
-          topContainer.innerHTML = `<table class="admin-table">
-            <thead><tr><th>#</th><th>Pack</th><th>Total Downloads</th><th>Period Downloads</th></tr></thead>
-            <tbody>${data.top_packs.map((p, i) => `<tr><td>${i + 1}</td><td>${p.name}</td><td>${(p.total_downloads || 0).toLocaleString()}</td><td>${(p.period_downloads || 0).toLocaleString()}</td></tr>`).join('')}</tbody>
-          </table>`;
+          topContainer.innerHTML = `<table class="admin-table"><thead><tr><th>#</th><th>Pack</th><th>Total Downloads</th><th>Period Downloads</th></tr></thead><tbody>${data.top_packs.map((p, i) => `<tr><td>${i + 1}</td><td>${p.name}</td><td>${(p.total_downloads || 0).toLocaleString()}</td><td>${(p.period_downloads || 0).toLocaleString()}</td></tr>`).join('')}</tbody></table>`;
         } else {
           topContainer.innerHTML = '<p style="color: var(--text-secondary);">No data available yet.</p>';
         }
@@ -755,9 +680,6 @@
       }
     }
 
-    // ============================================================
-    // Init
-    // ============================================================
     requireAuth();
     loadDashboard();
   </script>

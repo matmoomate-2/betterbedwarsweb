@@ -35,6 +35,8 @@ exports.handler = async (event) => {
       'server_name',
       'footer_text',
       'footer_links',
+      'logo_url',
+      'favicon_url',
       'primary_color',
       'secondary_color',
       'accent_color',

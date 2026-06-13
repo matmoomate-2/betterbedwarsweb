@@ -24,6 +24,8 @@ CREATE TABLE site_settings (
   server_name TEXT DEFAULT '',
   footer_text TEXT DEFAULT '© 2024 Better Bedwars. Not affiliated with Mojang Studios.',
   footer_links JSONB DEFAULT '[]',
+  logo_url TEXT DEFAULT '',
+  favicon_url TEXT DEFAULT '',
   primary_color TEXT DEFAULT '#5c6bc0',
   secondary_color TEXT DEFAULT '#26c6da',
   accent_color TEXT DEFAULT '#ff7043',

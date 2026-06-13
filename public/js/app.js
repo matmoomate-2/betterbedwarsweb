@@ -48,6 +48,39 @@ const App = (() => {
       el.textContent = s.site_name || 'Better Bedwars';
     });
 
+    // Logo in nav bar
+    if (s.logo_url) {
+      const brandIcon = document.querySelector('.nav-brand .brand-icon');
+      const brandLink = document.querySelector('.nav-brand');
+      if (brandLink) {
+        // Replace the text brand icon with an image logo
+        const existingLogo = brandLink.querySelector('.nav-logo-img');
+        if (existingLogo) {
+          existingLogo.src = s.logo_url;
+        } else if (brandIcon) {
+          const img = document.createElement('img');
+          img.className = 'nav-logo-img';
+          img.src = s.logo_url;
+          img.alt = s.site_name || 'Logo';
+          img.style.height = '36px';
+          img.style.width = 'auto';
+          img.style.borderRadius = '8px';
+          brandIcon.replaceWith(img);
+        }
+      }
+    }
+
+    // Favicon
+    if (s.favicon_url) {
+      let link = document.querySelector('link[rel="icon"]');
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = s.favicon_url;
+    }
+
     // Announcement bar
     const annBar = document.getElementById('announcement-bar');
     const annText = document.getElementById('announcement-text');
@@ -58,8 +91,6 @@ const App = (() => {
         annBar.className = `announcement-bar visible announcement-${s.announcement_type || 'info'}`;
       }
     }
-
-    // Dynamic favicon / theme color could be set here
 
     // Store settings globally for other modules
     window._siteSettings = s;

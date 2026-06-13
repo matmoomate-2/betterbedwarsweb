@@ -23,6 +23,8 @@ const API = (() => {
     youtube_url: '#',
     github_url: '#',
     email_contact: 'hello@betterbedwars.com',
+    logo_url: '',
+    favicon_url: '',
     primary_color: '#5c6bc0',
     secondary_color: '#26c6da',
     accent_color: '#ff7043',
