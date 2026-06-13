@@ -131,16 +131,18 @@ const App = (() => {
     // Check for saved theme preference
     const savedTheme = localStorage.getItem('bb-theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const isDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+    // Default to dark (our site theme)
+    const isDark = savedTheme ? savedTheme === 'dark' : true;
 
     // Apply initial theme
     applyTheme(isDark);
 
     toggle.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const newTheme = current === 'light' ? 'dark' : 'light';
-      applyTheme(newTheme === 'dark');
-      localStorage.setItem('bb-theme', newTheme);
+      const root = document.documentElement;
+      const hasTheme = root.getAttribute('data-theme') === 'light';
+      const newIsDark = hasTheme; // if currently light, go dark; if dark (no attr), go light
+      applyTheme(newIsDark);
+      localStorage.setItem('bb-theme', newIsDark ? 'dark' : 'light');
     });
   }
 
@@ -153,10 +155,10 @@ const App = (() => {
 
     if (isDark) {
       root.removeAttribute('data-theme');
-      if (toggle) toggle.innerHTML = '☀️';
+      if (toggle) toggle.textContent = '☀️';
     } else {
       root.setAttribute('data-theme', 'light');
-      if (toggle) toggle.innerHTML = '🌙';
+      if (toggle) toggle.textContent = '🌙';
     }
   }
 
