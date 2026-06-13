@@ -1,0 +1,17 @@
+{
+  "name": "better-bedwars-website",
+  "version": "1.0.0",
+  "description": "Better Bedwars Minecraft Texture Pack Website",
+  "scripts": {
+    "build": "echo 'Static site - no build step required'",
+    "dev": "npx serve public"
+  },
+  "dependencies": {
+    "@netlify/functions": "^2.8.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}

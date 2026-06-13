@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minecraft Server - Better Bedwars</title>
+  <meta name="description" content="Join the Better Bedwars Minecraft server. Play Bedwars with our community." />
+  <meta name="theme-color" content="#5c6bc0" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div id="announcement-bar" class="announcement-bar">
+    <span id="announcement-text"></span>
+    <button class="close-announcement" aria-label="Dismiss">&times;</button>
+  </div>
+
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="container">
+      <a href="/" class="nav-brand">
+        <div class="brand-icon">BB</div>
+        <span class="nav-brand-text">Better Bedwars</span>
+      </a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/pack.html?id=better-bedwars">Better Bedwars</a>
+        <a href="/packs.html">Packs</a>
+        <a href="/server.html" class="active">Server</a>
+        <a href="/downloads.html">Downloads</a>
+      </div>
+      <div class="nav-actions">
+        <button class="theme-toggle" aria-label="Toggle theme">☀️</button>
+        <button class="mobile-menu-btn" aria-label="Open menu" aria-expanded="false">☰</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="mobile-overlay"></div>
+  <nav class="mobile-nav" role="navigation" aria-label="Mobile navigation">
+    <button class="mobile-nav-close" aria-label="Close menu">&times;</button>
+    <a href="/">Home</a>
+    <a href="/pack.html?id=better-bedwars">Better Bedwars</a>
+    <a href="/packs.html">Packs</a>
+    <a href="/server.html">Server</a>
+    <a href="/downloads.html">Downloads</a>
+  </nav>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero" style="min-height: auto; padding: 60px 0;">
+      <div class="container">
+        <h1 class="section-title" id="server-name" style="margin-bottom: 8px;">Better Bedwars Network</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">Join our Minecraft server for the ultimate Bedwars experience</p>
+
+        <div class="server-ip-box">
+          <span class="ip-text" id="server-ip">play.betterbedwars.com</span>
+          <button id="copy-ip" class="copy-btn">📋 Copy IP</button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+          <div id="server-status" class="server-status offline">
+            <span class="status-dot"></span> Checking...
+          </div>
+          <div class="player-count">
+            👥 <span id="player-count-value">0</span><span class="player-label">/<span id="player-max-value">0</span> players online</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px;">
+          <a href="#" class="btn btn-accent btn-lg btn-join-discord" target="_blank" rel="noopener">💬 Join our Discord</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">Server Features</h2>
+        <p class="section-subtitle">What makes our server special</p>
+        <div id="features-list" class="features-list">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Staff -->
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">Our Staff Team</h2>
+        <p class="section-subtitle">Meet the people running the server</p>
+        <div id="staff-grid" class="staff-grid">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rules -->
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">Server Rules</h2>
+        <p class="section-subtitle">Please follow these rules to keep the server fun for everyone</p>
+        <div id="rules-list" class="rules-list">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3 class="nav-brand-text">Better Bedwars</h3>
+          <p>The ultimate Bedwars texture pack for Minecraft. Not affiliated with Mojang Studios.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Quick Links</h4>
+          <a href="/pack.html?id=better-bedwars">Better Bedwars</a>
+          <a href="/packs.html">All Packs</a>
+          <a href="/server.html">Minecraft Server</a>
+          <a href="/downloads.html">Downloads</a>
+        </div>
+        <div class="footer-links">
+          <h4>Resources</h4>
+          <a href="/pack.html?id=better-bedwars#installation">Installation Guide</a>
+          <a href="/pack.html?id=better-bedwars#changelog">Changelog</a>
+          <a href="/packs.html">Other Packs</a>
+        </div>
+        <div class="footer-links">
+          <h4>Links</h4>
+          <div id="footer-links"><a href="#">Loading...</a></div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span id="footer-text">© 2024 Better Bedwars. Not affiliated with Mojang Studios.</span>
+        <div class="footer-social">
+          <a href="#" aria-label="Discord" target="_blank" rel="noopener">💬</a>
+          <a href="#" aria-label="YouTube" target="_blank" rel="noopener">📺</a>
+          <a href="#" aria-label="GitHub" target="_blank" rel="noopener">💻</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div id="lightbox" class="lightbox">
+    <button class="lightbox-close" aria-label="Close">&times;</button>
+    <button class="lightbox-prev" aria-label="Previous">‹</button>
+    <button class="lightbox-next" aria-label="Next">›</button>
+    <img src="" alt="Screenshot" />
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/utils.js"></script>
+  <script src="/js/toast.js"></script>
+  <script src="/js/server.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

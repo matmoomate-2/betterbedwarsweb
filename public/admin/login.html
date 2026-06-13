@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login - Better Bedwars</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body>
+  <div class="admin-login-page">
+    <div class="login-card">
+      <h1>🔐 Admin Login</h1>
+      <p class="login-subtitle">Better Bedwars Management Dashboard</p>
+
+      <div id="login-error" class="login-error"></div>
+
+      <form id="login-form" autocomplete="off">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" class="form-control" placeholder="Enter username" required autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" class="form-control" placeholder="Enter password" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; justify-content: center;">
+          Sign In
+        </button>
+      </form>
+
+      <div style="text-align: center; margin-top: 24px;">
+        <a href="/" style="color: var(--text-muted); font-size: 0.85rem;">← Back to website</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const FUNCTIONS_BASE = '/.netlify/functions';
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errorEl = document.getElementById('login-error');
+      errorEl.classList.remove('visible');
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      if (!username || !password) {
+        errorEl.textContent = 'Please enter both username and password.';
+        errorEl.classList.add('visible');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${FUNCTIONS_BASE}/admin-auth`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Login failed');
+        }
+
+        // Store token and user info
+        localStorage.setItem('bb-admin-token', data.token);
+        localStorage.setItem('bb-admin-user', JSON.stringify(data.user));
+        window.location.href = '/admin/';
+      } catch (error) {
+        errorEl.textContent = error.message || 'Login failed. Please try again.';
+        errorEl.classList.add('visible');
+      }
+    });
+  </script>
+</body>
+</html>

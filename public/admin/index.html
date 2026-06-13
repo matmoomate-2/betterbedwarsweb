@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard - Better Bedwars</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body>
+  <div class="admin-wrapper">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <div class="admin-sidebar-header">
+        <h2>⚙️ Admin Panel</h2>
+      </div>
+      <nav class="admin-sidebar-nav">
+        <a href="#dashboard" class="active" data-tab="dashboard">📊 Dashboard</a>
+        <a href="#packs" data-tab="packs">📦 Packs</a>
+        <a href="#versions" data-tab="versions">🔖 Versions</a>
+        <a href="#settings" data-tab="settings">⚡ Site Settings</a>
+        <a href="#analytics" data-tab="analytics">📈 Analytics</a>
+      </nav>
+      <div class="admin-sidebar-footer">
+        <a href="/" style="display: block; padding: 8px 0; color: var(--text-secondary);">← View Site</a>
+        <button onclick="handleLogout()" style="display: block; padding: 8px 0; color: var(--danger); background: none; border: none; cursor: pointer; font-size: 0.9rem;">🚪 Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <div class="admin-mobile-toggle">
+        <button onclick="document.getElementById('admin-sidebar').classList.toggle('open')" class="btn btn-secondary btn-sm">☰ Menu</button>
+      </div>
+
+      <!-- Dashboard Tab -->
+      <div id="tab-dashboard" class="tab-content active">
+        <div class="admin-header">
+          <h1>📊 Dashboard</h1>
+          <span style="color: var(--text-secondary); font-size: 0.9rem;">Welcome, <strong id="admin-user-display">Admin</strong></span>
+        </div>
+        <div class="stats-grid" id="dashboard-stats">
+          <div class="stat-card"><div class="stat-label">Total Downloads</div><div class="stat-value" id="stat-downloads">—</div></div>
+          <div class="stat-card"><div class="stat-label">Period Downloads (30d)</div><div class="stat-value" id="stat-period">—</div></div>
+          <div class="stat-card"><div class="stat-label">Total Packs</div><div class="stat-value" id="stat-packs">—</div></div>
+          <div class="stat-card"><div class="stat-label">Total Versions</div><div class="stat-value" id="stat-versions">—</div></div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom: 16px;">Top Packs</h3>
+          <div id="top-packs-list"><p style="color: var(--text-secondary);">Loading...</p></div>
+        </div>
+      </div>
+
+      <!-- Packs Tab -->
+      <div id="tab-packs" class="tab-content">
+        <div class="admin-header">
+          <h1>📦 Manage Packs</h1>
+          <button class="btn btn-primary" onclick="openPackEditor()">+ New Pack</button>
+        </div>
+        <div class="card">
+          <div id="packs-list"><p style="color: var(--text-secondary); padding: 20px;">Loading packs...</p></div>
+        </div>
+      </div>
+
+      <!-- Versions Tab -->
+      <div id="tab-versions" class="tab-content">
+        <div class="admin-header">
+          <h1>🔖 Manage Versions</h1>
+          <button class="btn btn-primary" onclick="openVersionEditor()">+ New Version</button>
+        </div>
+        <div class="card">
+          <div id="versions-list"><p style="color: var(--text-secondary); padding: 20px;">Loading versions...</p></div>
+        </div>
+      </div>
+
+      <!-- Settings Tab -->
+      <div id="tab-settings" class="tab-content">
+        <div class="admin-header">
+          <h1>⚡ Site Settings</h1>
+          <button class="btn btn-primary" onclick="saveSiteSettings()">💾 Save All Settings</button>
+        </div>
+        <div class="card">
+          <form id="settings-form" class="admin-form">
+            <!-- General -->
+            <h3 style="margin-bottom: 16px;">General</h3>
+            <div class="form-row">
+              <div class="form-group"><label>Site Name</label><input type="text" id="set-site_name" class="form-control" /></div>
+              <div class="form-group"><label>Description</label><input type="text" id="set-description" class="form-control" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Hero Title</label><input type="text" id="set-hero_title" class="form-control" /></div>
+              <div class="form-group"><label>Hero Subtitle</label><input type="text" id="set-hero_subtitle" class="form-control" /></div>
+            </div>
+            <div class="form-group"><label>Featured Pack ID</label><input type="text" id="set-featured_pack_id" class="form-control" placeholder="e.g. better-bedwars" /></div>
+
+            <!-- Announcement -->
+            <h3 style="margin: 24px 0 16px;">Announcement Banner</h3>
+            <div class="form-row">
+              <div class="form-group"><label>Announcement Text</label><input type="text" id="set-announcement_text" class="form-control" /></div>
+              <div class="form-group">
+                <label>Type</label>
+                <select id="set-announcement_type" class="form-control"><option value="info">Info</option><option value="warning">Warning</option><option value="success">Success</option><option value="danger">Danger</option></select>
+              </div>
+            </div>
+            <div class="form-group"><label class="form-checkbox"><input type="checkbox" id="set-announcement_enabled" /> Enable Announcement Banner</label></div>
+
+            <!-- Social Links -->
+            <h3 style="margin: 24px 0 16px;">Social Links</h3>
+            <div class="form-row">
+              <div class="form-group"><label>Discord URL</label><input type="url" id="set-discord_url" class="form-control" /></div>
+              <div class="form-group"><label>YouTube URL</label><input type="url" id="set-youtube_url" class="form-control" /></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>GitHub URL</label><input type="url" id="set-github_url" class="form-control" /></div>
+              <div class="form-group"><label>Email Contact</label><input type="email" id="set-email_contact" class="form-control" /></div>
+            </div>
+
+            <!-- Server -->
+            <h3 style="margin: 24px 0 16px;">Minecraft Server</h3>
+            <div class="form-row">
+              <div class="form-group"><label>Server IP</label><input type="text" id="set-server_ip" class="form-control" /></div>
+              <div class="form-group"><label>Server Name</label><input type="text" id="set-server_name" class="form-control" /></div>
+            </div>
+
+            <!-- Footer -->
+            <h3 style="margin: 24px 0 16px;">Footer</h3>
+            <div class="form-group"><label>Footer Text</label><input type="text" id="set-footer_text" class="form-control" /></div>
+            <div class="form-group"><label>Footer Links (JSON array)</label><textarea id="set-footer_links" class="form-control json-editor" placeholder='[{"label":"Privacy","url":"/privacy"},{"label":"Terms","url":"/terms"}]'></textarea><div class="form-hint">JSON array of {label, url} objects</div></div>
+
+            <!-- Branding -->
+            <h3 style="margin: 24px 0 16px;">Branding Colors</h3>
+            <div class="form-row">
+              <div class="form-group"><label>Primary Color</label><div class="color-picker-wrapper"><input type="color" id="set-primary_color" /><input type="text" id="set-primary_color_text" class="form-control" /></div></div>
+              <div class="form-group"><label>Secondary Color</label><div class="color-picker-wrapper"><input type="color" id="set-secondary_color" /><input type="text" id="set-secondary_color_text" class="form-control" /></div></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Accent Color</label><div class="color-picker-wrapper"><input type="color" id="set-accent_color" /><input type="text" id="set-accent_color_text" class="form-control" /></div></div>
+              <div class="form-group"><label>Dark Background</label><div class="color-picker-wrapper"><input type="color" id="set-dark_bg" /><input type="text" id="set-dark_bg_text" class="form-control" /></div></div>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-lg" onclick="saveSiteSettings()" style="margin-top: 16px;">💾 Save All Settings</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Analytics Tab -->
+      <div id="tab-analytics" class="tab-content">
+        <div class="admin-header">
+          <h1>📈 Analytics</h1>
+          <div>
+            <select id="analytics-period" class="filter-select" onchange="loadAnalytics()">
+              <option value="7d">Last 7 days</option>
+              <option value="30d" selected>Last 30 days</option>
+              <option value="90d">Last 90 days</option>
+              <option value="all">All Time</option>
+            </select>
+          </div>
+        </div>
+        <div class="stats-grid" id="analytics-stats">
+          <div class="stat-card"><div class="stat-label">Total Downloads</div><div class="stat-value" id="ana-total">—</div></div>
+          <div class="stat-card"><div class="stat-label">Period Downloads</div><div class="stat-value" id="ana-period">—</div></div>
+          <div class="stat-card"><div class="stat-label">Total Packs</div><div class="stat-value" id="ana-packs">—</div></div>
+          <div class="stat-card"><div class="stat-label">Total Versions</div><div class="stat-value" id="ana-versions">—</div></div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom: 16px;">Top Packs by Downloads</h3>
+          <div id="analytics-top-packs"><p style="color: var(--text-secondary);">Loading...</p></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Pack Editor Modal -->
+  <div id="pack-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 32px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+        <h2 id="pack-modal-title">New Pack</h2>
+        <button onclick="closePackEditor()" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: none; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 1.2rem; cursor: pointer;">&times;</button>
+      </div>
+      <form id="pack-editor-form" class="admin-form">
+        <div class="form-row">
+          <div class="form-group"><label>Pack ID (slug)</label><input type="text" id="pack-id" class="form-control" required placeholder="e.g. my-pack" /></div>
+          <div class="form-group"><label>Name</label><input type="text" id="pack-name" class="form-control" required /></div>
+        </div>
+        <div class="form-group"><label>Description</label><textarea id="pack-description" class="form-control" rows="4"></textarea></div>
+        <div class="form-group"><label>Short Description</label><input type="text" id="pack-short_desc" class="form-control" /></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="pack-category" class="form-control">
+              <option value="bedwars">Bedwars</option><option value="pvp">PvP</option><option value="skywars">Skywars</option><option value="default">Default</option><option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Author</label><input type="text" id="pack-author" class="form-control" /></div>
+        </div>
+        <div class="form-group"><label>Minecraft Versions (comma separated)</label><input type="text" id="pack-versions" class="form-control" placeholder="e.g. 1.8.9, 1.19, 1.20" /></div>
+        <div class="form-group"><label>Icon URL</label><input type="url" id="pack-icon" class="form-control" /></div>
+        <div class="form-group"><label>Banner URL</label><input type="url" id="pack-banner" class="form-control" /></div>
+        <div class="form-group"><label>Screenshots (JSON array of URLs)</label><textarea id="pack-screenshots" class="form-control json-editor" placeholder='["https://...", "https://..."]'></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-checkbox"><input type="checkbox" id="pack-featured" /> Featured Pack</label></div>
+          <div class="form-group"><label class="form-checkbox"><input type="checkbox" id="pack-published" checked /> Published</label></div>
+        </div>
+        <div style="display: flex; gap: 12px; margin-top: 16px;">
+          <button type="submit" class="btn btn-primary">💾 Save Pack</button>
+          <button type="button" class="btn btn-secondary" onclick="closePackEditor()">Cancel</button>
+          <button type="button" id="pack-delete-btn" class="btn btn-secondary" style="color: var(--danger); margin-left: auto; display: none;" onclick="deleteCurrentPack()">🗑 Delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Version Editor Modal -->
+  <div id="version-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
+    <div style="background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 32px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+        <h2 id="version-modal-title">New Version</h2>
+        <button onclick="closeVersionEditor()" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: none; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-size: 1.2rem; cursor: pointer;">&times;</button>
+      </div>
+      <form id="version-editor-form" class="admin-form">
+        <div class="form-group">
+          <label>Pack</label>
+          <select id="ver-pack-id" class="form-control" required></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Version Number</label><input type="text" id="ver-version" class="form-control" required placeholder="e.g. 1.0.0" /></div>
+          <div class="form-group"><label>Minecraft Version</label><input type="text" id="ver-mc-version" class="form-control" placeholder="e.g. 1.8.9 - 1.20" /></div>
+        </div>
+        <div class="form-group"><label>File URL</label><input type="url" id="ver-file-url" class="form-control" required /></div>
+        <div class="form-row">
+          <div class="form-group"><label>File Size (bytes)</label><input type="number" id="ver-file-size" class="form-control" /></div>
+          <div class="form-group"><label>File Format</label><select id="ver-file-format" class="form-control"><option value=".zip">.zip</option><option value=".rar">.rar</option></select></div>
+        </div>
+        <div class="form-group"><label>Changelog (Markdown)</label><textarea id="ver-changelog" class="form-control" rows="6" placeholder="## What's New&#10;- Feature 1&#10;- Feature 2"></textarea></div>
+        <div class="form-group"><label class="form-checkbox"><input type="checkbox" id="ver-is-latest" /> Mark as Latest Version</label></div>
+        <div style="display: flex; gap: 12px; margin-top: 16px;">
+          <button type="submit" class="btn btn-primary">💾 Save Version</button>
+          <button type="button" class="btn btn-secondary" onclick="closeVersionEditor()">Cancel</button>
+          <button type="button" id="version-delete-btn" class="btn btn-secondary" style="color: var(--danger); margin-left: auto; display: none;" onclick="deleteCurrentVersion()">🗑 Delete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const FUNCTIONS_BASE = '/.netlify/functions';
+
+    // ============================================================
+    // Auth
+    // ============================================================
+    function getToken() { return localStorage.getItem('bb-admin-token'); }
+    function getUser() {
+      try { return JSON.parse(localStorage.getItem('bb-admin-user')); } catch { return null; }
+    }
+
+    function requireAuth() {
+      const token = getToken();
+      if (!token) window.location.href = '/admin/login.html';
+      const user = getUser();
+      if (user && user.display_name) {
+        document.getElementById('admin-user-display').textContent = user.display_name;
+      } else if (user) {
+        document.getElementById('admin-user-display').textContent = user.username;
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('bb-admin-token');
+      localStorage.removeItem('bb-admin-user');
+      window.location.href = '/admin/login.html';
+    }
+
+    // ============================================================
+    // API helper
+    // ============================================================
+    async function adminFetch(functionName, payload = {}) {
+      const token = getToken();
+      const response = await fetch(`${FUNCTIONS_BASE}/${functionName}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Request failed');
+      return data;
+    }
+
+    async function adminGet(functionName, params = {}) {
+      const token = getToken();
+      const qs = new URLSearchParams(params).toString();
+      const url = `${FUNCTIONS_BASE}/${functionName}${qs ? '?' + qs : ''}`;
+      const response = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Request failed');
+      return data;
+    }
+
+    function showToast(message, type = 'success') {
+      const existing = document.querySelector('.admin-toast');
+      if (existing) existing.remove();
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type} admin-toast`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // ============================================================
+    // Tab System
+    // ============================================================
+    document.querySelectorAll('[data-tab]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const tab = link.dataset.tab;
+        document.querySelectorAll('[data-tab]').forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        // Close mobile sidebar
+        document.getElementById('admin-sidebar').classList.remove('open');
+        // Load tab data
+        if (tab === 'dashboard') loadDashboard();
+        if (tab === 'packs') loadPacks();
+        if (tab === 'versions') loadVersionsList();
+        if (tab === 'settings') loadSettings();
+        if (tab === 'analytics') loadAnalytics();
+      });
+    });
+
+    // ============================================================
+    // Dashboard
+    // ============================================================
+    async function loadDashboard() {
+      try {
+        const data = await adminGet('get-analytics', { period: '30d' });
+        document.getElementById('stat-downloads').textContent = (data.total_downloads || 0).toLocaleString();
+        document.getElementById('stat-period').textContent = (data.period_downloads || 0).toLocaleString();
+        document.getElementById('stat-packs').textContent = data.total_packs || 0;
+        document.getElementById('stat-versions').textContent = data.total_versions || 0;
+
+        const topList = document.getElementById('top-packs-list');
+        if (data.top_packs && data.top_packs.length > 0) {
+          topList.innerHTML = `<table class="admin-table">
+            <thead><tr><th>Pack</th><th>Total Downloads</th><th>Period Downloads</th></tr></thead>
+            <tbody>${data.top_packs.map(p => `<tr><td>${p.name}</td><td>${(p.total_downloads || 0).toLocaleString()}</td><td>${(p.period_downloads || 0).toLocaleString()}</td></tr>`).join('')}</tbody>
+          </table>`;
+        } else {
+          topList.innerHTML = '<p style="color: var(--text-secondary);">No data available yet.</p>';
+        }
+      } catch (e) {
+        showToast('Failed to load dashboard: ' + e.message, 'error');
+      }
+    }
+
+    // ============================================================
+    // Packs Management
+    // ============================================================
+    let currentPackId = null;
+
+    async function loadPacks() {
+      try {
+        const supabaseUrl = '{{SUPABASE_URL}}';
+        const anonKey = '{{SUPABASE_ANON_KEY}}';
+        const response = await fetch(`${supabaseUrl}/rest/v1/packs?select=*&order=created_at.desc`, {
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        });
+        const packs = await response.json();
+
+        const container = document.getElementById('packs-list');
+        if (!packs || packs.length === 0) {
+          container.innerHTML = '<div class="empty-state"><div class="empty-icon">📦</div><h3>No packs yet</h3><p>Create your first texture pack.</p></div>';
+          return;
+        }
+        container.innerHTML = `<table class="admin-table">
+          <thead><tr><th>Name</th><th>ID</th><th>Category</th><th>Downloads</th><th>Featured</th><th>Published</th><th>Actions</th></tr></thead>
+          <tbody>${packs.map(p => `<tr>
+            <td><strong>${p.name}</strong></td>
+            <td style="color: var(--text-muted); font-size: 0.85rem;">${p.id}</td>
+            <td><span class="badge badge-primary">${p.category || 'other'}</span></td>
+            <td>${(p.download_count || 0).toLocaleString()}</td>
+            <td>${p.featured ? '<span class="admin-badge admin-badge-success">✓</span>' : '—'}</td>
+            <td>${p.is_published ? '<span class="admin-badge admin-badge-success">Published</span>' : '<span class="admin-badge admin-badge-warning">Draft</span>'}</td>
+            <td><div class="admin-actions">
+              <button class="btn btn-secondary btn-sm" onclick="editPack('${p.id}')">✏️</button>
+              <button class="btn btn-secondary btn-sm" onclick="deletePack('${p.id}')" style="color: var(--danger);">🗑</button>
+            </div></td>
+          </tr>`).join('')}</tbody>
+        </table>`;
+      } catch (e) {
+        document.getElementById('packs-list').innerHTML = '<p style="color: var(--danger);">Failed to load packs: ' + e.message + '</p>';
+      }
+    }
+
+    async function editPack(packId) {
+      const supabaseUrl = '{{SUPABASE_URL}}';
+      const anonKey = '{{SUPABASE_ANON_KEY}}';
+      try {
+        const response = await fetch(`${supabaseUrl}/rest/v1/packs?select=*&id=eq.${packId}&limit=1`, {
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        });
+        const packs = await response.json();
+        const pack = packs[0];
+        if (!pack) { showToast('Pack not found', 'error'); return; }
+
+        document.getElementById('pack-modal-title').textContent = `Edit: ${pack.name}`;
+        document.getElementById('pack-id').value = pack.id;
+        document.getElementById('pack-name').value = pack.name || '';
+        document.getElementById('pack-description').value = pack.description || '';
+        document.getElementById('pack-short_desc').value = pack.short_description || '';
+        document.getElementById('pack-category').value = pack.category || 'other';
+        document.getElementById('pack-author').value = pack.author || '';
+        document.getElementById('pack-versions').value = (pack.minecraft_versions || []).join(', ');
+        document.getElementById('pack-icon').value = pack.icon_url || '';
+        document.getElementById('pack-banner').value = pack.banner_url || '';
+        document.getElementById('pack-screenshots').value = JSON.stringify(pack.screenshots || [], null, 2);
+        document.getElementById('pack-featured').checked = pack.featured || false;
+        document.getElementById('pack-published').checked = pack.is_published !== false;
+        document.getElementById('pack-delete-btn').style.display = 'flex';
+        currentPackId = pack.id;
+        document.getElementById('pack-modal').style.display = 'flex';
+      } catch (e) {
+        showToast('Failed to load pack: ' + e.message, 'error');
+      }
+    }
+
+    function openPackEditor() {
+      document.getElementById('pack-modal-title').textContent = 'New Pack';
+      document.getElementById('pack-editor-form').reset();
+      document.getElementById('pack-published').checked = true;
+      document.getElementById('pack-delete-btn').style.display = 'none';
+      document.getElementById('pack-id').removeAttribute('readonly');
+      currentPackId = null;
+      document.getElementById('pack-modal').style.display = 'flex';
+    }
+
+    function closePackEditor() {
+      document.getElementById('pack-modal').style.display = 'none';
+    }
+
+    document.getElementById('pack-editor-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const versionStr = document.getElementById('pack-versions').value.trim();
+      const screenshotStr = document.getElementById('pack-screenshots').value.trim();
+      let screenshots = [];
+      try { if (screenshotStr) screenshots = JSON.parse(screenshotStr); } catch { screenshots = []; }
+      const versions = versionStr ? versionStr.split(',').map(v => v.trim()).filter(Boolean) : [];
+
+      const payload = {
+        id: document.getElementById('pack-id').value.trim(),
+        name: document.getElementById('pack-name').value.trim(),
+        description: document.getElementById('pack-description').value.trim(),
+        short_description: document.getElementById('pack-short_desc').value.trim(),
+        category: document.getElementById('pack-category').value,
+        minecraft_versions: versions,
+        author: document.getElementById('pack-author').value.trim(),
+        icon_url: document.getElementById('pack-icon').value.trim(),
+        banner_url: document.getElementById('pack-banner').value.trim(),
+        screenshots,
+        featured: document.getElementById('pack-featured').checked,
+        is_published: document.getElementById('pack-published').checked,
+      };
+
+      try {
+        await adminFetch('upload-pack', payload);
+        showToast('Pack saved successfully!');
+        closePackEditor();
+        loadPacks();
+      } catch (e) {
+        showToast('Failed to save pack: ' + e.message, 'error');
+      }
+    });
+
+    async function deletePack(packId) {
+      if (!confirm(`Are you sure you want to delete "${packId}"? This cannot be undone.`)) return;
+      try {
+        const supabaseUrl = '{{SUPABASE_URL}}';
+        const anonKey = '{{SUPABASE_ANON_KEY}}';
+        const token = getToken();
+        // Delete via direct REST call (in production use a dedicated function)
+        await fetch(`${supabaseUrl}/rest/v1/versions?pack_id=eq.${packId}`, {
+          method: 'DELETE',
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, Prefer: 'return=representation' },
+        });
+        await fetch(`${supabaseUrl}/rest/v1/packs?id=eq.${packId}`, {
+          method: 'DELETE',
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, Prefer: 'return=representation' },
+        });
+        showToast('Pack deleted');
+        loadPacks();
+      } catch (e) {
+        showToast('Delete failed: ' + e.message, 'error');
+      }
+    }
+
+    async function deleteCurrentPack() {
+      if (currentPackId) await deletePack(currentPackId);
+    }
+
+    // ============================================================
+    // Versions Management
+    // ============================================================
+    let currentVersionId = null;
+
+    async function loadVersionsList() {
+      try {
+        const supabaseUrl = '{{SUPABASE_URL}}';
+        const anonKey = '{{SUPABASE_ANON_KEY}}';
+        const response = await fetch(`${supabaseUrl}/rest/v1/versions?select=*,packs(name)&order=created_at.desc&limit=50`, {
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        });
+        const versions = await response.json();
+        const container = document.getElementById('versions-list');
+
+        if (!versions || versions.length === 0) {
+          container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔖</div><h3>No versions yet</h3><p>Add a version to a pack.</p></div>';
+          return;
+        }
+
+        container.innerHTML = `<table class="admin-table">
+          <thead><tr><th>Pack</th><th>Version</th><th>MC Version</th><th>Size</th><th>Downloads</th><th>Latest</th><th>Actions</th></tr></thead>
+          <tbody>${versions.map(v => `<tr>
+            <td>${v.packs?.name || v.pack_id}</td>
+            <td><strong>${v.version}</strong></td>
+            <td><span class="tag">${v.minecraft_version || '—'}</span></td>
+            <td>${v.file_size ? (v.file_size / 1048576).toFixed(1) + ' MB' : '—'}</td>
+            <td>${v.downloads || 0}</td>
+            <td>${v.is_latest ? '<span class="admin-badge admin-badge-success">Latest</span>' : '—'}</td>
+            <td><div class="admin-actions">
+              <button class="btn btn-secondary btn-sm" onclick="editVersion('${v.id}')">✏️</button>
+              <button class="btn btn-secondary btn-sm" onclick="deleteVersion('${v.id}')" style="color: var(--danger);">🗑</button>
+            </div></td>
+          </tr>`).join('')}</tbody>
+        </table>`;
+      } catch (e) {
+        document.getElementById('versions-list').innerHTML = '<p style="color: var(--danger);">Failed to load versions: ' + e.message + '</p>';
+      }
+    }
+
+    async function openVersionEditor() {
+      currentVersionId = null;
+      document.getElementById('version-modal-title').textContent = 'New Version';
+      document.getElementById('version-editor-form').reset();
+      document.getElementById('version-delete-btn').style.display = 'none';
+      await populatePackSelect();
+      document.getElementById('version-modal').style.display = 'flex';
+    }
+
+    function closeVersionEditor() {
+      document.getElementById('version-modal').style.display = 'none';
+    }
+
+    async function populatePackSelect(selectedId) {
+      const select = document.getElementById('ver-pack-id');
+      try {
+        const supabaseUrl = '{{SUPABASE_URL}}';
+        const anonKey = '{{SUPABASE_ANON_KEY}}';
+        const response = await fetch(`${supabaseUrl}/rest/v1/packs?select=id,name&is_published=eq.true`, {
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        });
+        const packs = await response.json();
+        select.innerHTML = '<option value="">Select a pack...</option>' +
+          (packs || []).map(p => `<option value="${p.id}" ${p.id === selectedId ? 'selected' : ''}>${p.name}</option>`).join('');
+      } catch {
+        select.innerHTML = '<option value="">Error loading packs</option>';
+      }
+    }
+
+    async function editVersion(versionId) {
+      try {
+        const supabaseUrl = '{{SUPABASE_URL}}';
+        const anonKey = '{{SUPABASE_ANON_KEY}}';
+        const response = await fetch(`${supabaseUrl}/rest/v1/versions?id=eq.${versionId}&limit=1`, {
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        });
+        const versions = await response.json();
+        const v = versions[0];
+        if (!v) { showToast('Version not found', 'error'); return; }
+
+        document.getElementById('version-modal-title').textContent = `Edit: v${v.version}`;
+        await populatePackSelect(v.pack_id);
+        document.getElementById('ver-version').value = v.version || '';
+        document.getElementById('ver-mc-version').value = v.minecraft_version || '';
+        document.getElementById('ver-file-url').value = v.file_url || '';
+        document.getElementById('ver-file-size').value = v.file_size || 0;
+        document.getElementById('ver-file-format').value = v.file_format || '.zip';
+        document.getElementById('ver-changelog').value = v.changelog || '';
+        document.getElementById('ver-is-latest').checked = v.is_latest || false;
+        document.getElementById('version-delete-btn').style.display = 'flex';
+        currentVersionId = v.id;
+        document.getElementById('version-modal').style.display = 'flex';
+      } catch (e) {
+        showToast('Failed to load version: ' + e.message, 'error');
+      }
+    }
+
+    document.getElementById('version-editor-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        pack_id: document.getElementById('ver-pack-id').value,
+        version: document.getElementById('ver-version').value.trim(),
+        minecraft_version: document.getElementById('ver-mc-version').value.trim(),
+        file_url: document.getElementById('ver-file-url').value.trim(),
+        file_size: parseInt(document.getElementById('ver-file-size').value) || 0,
+        file_format: document.getElementById('ver-file-format').value,
+        changelog: document.getElementById('ver-changelog').value.trim(),
+        is_latest: document.getElementById('ver-is-latest').checked,
+      };
+
+      if (!payload.pack_id || !payload.version || !payload.file_url) {
+        showToast('Pack, Version, and File URL are required', 'error');
+        return;
+      }
+
+      try {
+        await adminFetch('upload-version', payload);
+        showToast('Version saved successfully!');
+        closeVersionEditor();
+        loadVersionsList();
+      } catch (e) {
+        showToast('Failed to save version: ' + e.message, 'error');
+      }
+    });
+
+    async function deleteVersion(versionId) {
+      if (!confirm('Delete this version?')) return;
+      try {
+        const supabaseUrl = '{{SUPABASE_URL}}';
+        const anonKey = '{{SUPABASE_ANON_KEY}}';
+        await fetch(`${supabaseUrl}/rest/v1/versions?id=eq.${versionId}`, {
+          method: 'DELETE',
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        });
+        showToast('Version deleted');
+        loadVersionsList();
+      } catch (e) {
+        showToast('Delete failed: ' + e.message, 'error');
+      }
+    }
+
+    async function deleteCurrentVersion() {
+      if (currentVersionId) await deleteVersion(currentVersionId);
+    }
+
+    // ============================================================
+    // Site Settings
+    // ============================================================
+    async function loadSettings() {
+      try {
+        const supabaseUrl = '{{SUPABASE_URL}}';
+        const anonKey = '{{SUPABASE_ANON_KEY}}';
+        const response = await fetch(`${supabaseUrl}/rest/v1/site_settings?id=eq.global&limit=1`, {
+          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        });
+        const settings = await response.json();
+        const s = settings[0];
+        if (!s) return;
+
+        // Populate form fields
+        const fieldMap = {
+          site_name: 'set-site_name', description: 'set-description',
+          hero_title: 'set-hero_title', hero_subtitle: 'set-hero_subtitle',
+          featured_pack_id: 'set-featured_pack_id',
+          announcement_text: 'set-announcement_text', announcement_type: 'set-announcement_type',
+          announcement_enabled: 'set-announcement_enabled',
+          discord_url: 'set-discord_url', youtube_url: 'set-youtube_url',
+          github_url: 'set-github_url', email_contact: 'set-email_contact',
+          server_ip: 'set-server_ip', server_name: 'set-server_name',
+          footer_text: 'set-footer_text', footer_links: 'set-footer_links',
+          primary_color: 'set-primary_color', secondary_color: 'set-secondary_color',
+          accent_color: 'set-accent_color', dark_bg: 'set-dark_bg',
+        };
+
+        Object.entries(fieldMap).forEach(([key, elId]) => {
+          const el = document.getElementById(elId);
+          if (!el) return;
+          if (el.type === 'checkbox') {
+            el.checked = s[key] || false;
+          } else {
+            const val = s[key];
+            el.value = val !== null && val !== undefined ? (typeof val === 'object' ? JSON.stringify(val, null, 2) : String(val)) : '';
+          }
+        });
+
+        // Sync color pickers with text inputs
+        ['primary_color', 'secondary_color', 'accent_color', 'dark_bg'].forEach(key => {
+          const picker = document.getElementById(`set-${key}`);
+          const text = document.getElementById(`set-${key}_text`);
+          if (picker && text) {
+            picker.value = text.value || '#000000';
+            picker.addEventListener('input', () => { text.value = picker.value; });
+            text.addEventListener('input', () => { if (text.value.match(/^#[0-9a-f]{6}$/i)) picker.value = text.value; });
+          }
+        });
+      } catch (e) {
+        showToast('Failed to load settings: ' + e.message, 'error');
+      }
+    }
+
+    async function saveSiteSettings() {
+      const fields = [
+        'site_name', 'description', 'hero_title', 'hero_subtitle',
+        'featured_pack_id', 'announcement_text', 'announcement_type',
+        'discord_url', 'youtube_url', 'github_url', 'email_contact',
+        'server_ip', 'server_name', 'footer_text',
+        'primary_color', 'secondary_color', 'accent_color', 'dark_bg',
+      ];
+
+      const payload = {};
+      fields.forEach(key => {
+        const el = document.getElementById(`set-${key}`);
+        if (el) payload[key] = el.value;
+      });
+
+      // Checkboxes
+      payload.announcement_enabled = document.getElementById('set-announcement_enabled').checked;
+
+      // Footer links - parse JSON
+      const footerLinksEl = document.getElementById('set-footer_links');
+      if (footerLinksEl) {
+        try {
+          payload.footer_links = JSON.parse(footerLinksEl.value || '[]');
+        } catch {
+          showToast('Invalid footer links JSON', 'error');
+          return;
+        }
+      }
+
+      try {
+        await adminFetch('update-site-settings', payload);
+        showToast('Settings saved successfully!');
+      } catch (e) {
+        showToast('Failed to save settings: ' + e.message, 'error');
+      }
+    }
+
+    // ============================================================
+    // Analytics
+    // ============================================================
+    async function loadAnalytics() {
+      const period = document.getElementById('analytics-period').value;
+      try {
+        const data = await adminGet('get-analytics', { period });
+        document.getElementById('ana-total').textContent = (data.total_downloads || 0).toLocaleString();
+        document.getElementById('ana-period').textContent = (data.period_downloads || 0).toLocaleString();
+        document.getElementById('ana-packs').textContent = data.total_packs || 0;
+        document.getElementById('ana-versions').textContent = data.total_versions || 0;
+
+        const topContainer = document.getElementById('analytics-top-packs');
+        if (data.top_packs && data.top_packs.length > 0) {
+          topContainer.innerHTML = `<table class="admin-table">
+            <thead><tr><th>#</th><th>Pack</th><th>Total Downloads</th><th>Period Downloads</th></tr></thead>
+            <tbody>${data.top_packs.map((p, i) => `<tr><td>${i + 1}</td><td>${p.name}</td><td>${(p.total_downloads || 0).toLocaleString()}</td><td>${(p.period_downloads || 0).toLocaleString()}</td></tr>`).join('')}</tbody>
+          </table>`;
+        } else {
+          topContainer.innerHTML = '<p style="color: var(--text-secondary);">No data available yet.</p>';
+        }
+      } catch (e) {
+        showToast('Failed to load analytics: ' + e.message, 'error');
+      }
+    }
+
+    // ============================================================
+    // Init
+    // ============================================================
+    requireAuth();
+    loadDashboard();
+  </script>
+</body>
+</html>
