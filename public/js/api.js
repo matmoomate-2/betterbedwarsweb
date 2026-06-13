@@ -5,8 +5,9 @@
 
 const API = (() => {
   // Use environment variable or default to local dev
-  const SUPABASE_URL = window.SUPABASE_URL || 'https://your-project.supabase.co';
-  const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'your-anon-key';
+  // For production, use Netlify snippet injection to set window.SUPABASE_URL and window.SUPABASE_ANON_KEY
+  const SUPABASE_URL = window.SUPABASE_URL || 'https://ciyzlhoxwanclkrrsikb.supabase.co';
+  const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpeXpsaG94d2FuY2xrcnJzaWtiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzNDM5NDEsImV4cCI6MjA5NjkxOTk0MX0.lqJaD93lUUEGX2Qp0n5kMKPc5FcotDO_KiwifbpX3TI';
   const FUNCTIONS_BASE = '/.netlify/functions';
 
   /**
