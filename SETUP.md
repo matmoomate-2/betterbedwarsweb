@@ -205,7 +205,11 @@ The frontend needs to know your Supabase URL and anon key to read data. There ar
 ### Method A: Using Netlify Inject (Recommended — Most Secure)
 
 1. In Netlify dashboard, go to **Site settings** → **Build & deploy** → **Post processing** → **Snippet injection**
-2. Add this snippet in the `<head>` section (before closing `</head>`):
+2. Click **"Add snippet"**
+3. Fill in:
+   - **Name:** `Supabase API Config` (or anything you like — this is just a label)
+   - **Placement:** Select **`before </head>`** (this injects it into all pages)
+4. Paste this code into the content box:
 
 ```html
 <script>
@@ -214,9 +218,10 @@ The frontend needs to know your Supabase URL and anon key to read data. There ar
 </script>
 ```
 
-3. Click **"Save"** and redeploy
+5. Click **"Save"**
+6. Go back to your site and trigger a redeploy (Netlify → Deploys → **"Trigger deploy"** → **"Clear cache and deploy site"**)
 
-**Why this is best:** Your anon key is injected server-side, never visible in your source code.
+**Why this is best:** Your anon key is injected server-side into every HTML page, so it's never hardcoded in your source code files. If you ever need to change it, you just update the snippet — no code changes needed.
 
 ### Method B: Edit api.js Directly (Simpler for Testing)
 

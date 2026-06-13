@@ -246,6 +246,13 @@
     const FUNCTIONS_BASE = '/.netlify/functions';
 
     // ============================================================
+    // 🔑 SUPABASE CONFIG — Replace these with your actual values!
+    // ============================================================
+    // Get these from Supabase: Project Settings → API
+    const SUPABASE_URL = 'https://your-project.supabase.co';   // <-- CHANGE THIS
+    const SUPABASE_ANON_KEY = 'your-anon-key-here';            // <-- CHANGE THIS
+
+    // ============================================================
     // Auth
     // ============================================================
     function getToken() { return localStorage.getItem('bb-admin-token'); }
@@ -364,10 +371,8 @@
 
     async function loadPacks() {
       try {
-        const supabaseUrl = '{{SUPABASE_URL}}';
-        const anonKey = '{{SUPABASE_ANON_KEY}}';
-        const response = await fetch(`${supabaseUrl}/rest/v1/packs?select=*&order=created_at.desc`, {
-          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/packs?select=*&order=created_at.desc`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
         });
         const packs = await response.json();
 
@@ -397,11 +402,9 @@
     }
 
     async function editPack(packId) {
-      const supabaseUrl = '{{SUPABASE_URL}}';
-      const anonKey = '{{SUPABASE_ANON_KEY}}';
       try {
-        const response = await fetch(`${supabaseUrl}/rest/v1/packs?select=*&id=eq.${packId}&limit=1`, {
-          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/packs?select=*&id=eq.${packId}&limit=1`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
         });
         const packs = await response.json();
         const pack = packs[0];
@@ -478,17 +481,15 @@
     async function deletePack(packId) {
       if (!confirm(`Are you sure you want to delete "${packId}"? This cannot be undone.`)) return;
       try {
-        const supabaseUrl = '{{SUPABASE_URL}}';
-        const anonKey = '{{SUPABASE_ANON_KEY}}';
         const token = getToken();
         // Delete via direct REST call (in production use a dedicated function)
-        await fetch(`${supabaseUrl}/rest/v1/versions?pack_id=eq.${packId}`, {
+        await fetch(`${SUPABASE_URL}/rest/v1/versions?pack_id=eq.${packId}`, {
           method: 'DELETE',
-          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, Prefer: 'return=representation' },
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Prefer: 'return=representation' },
         });
-        await fetch(`${supabaseUrl}/rest/v1/packs?id=eq.${packId}`, {
+        await fetch(`${SUPABASE_URL}/rest/v1/packs?id=eq.${packId}`, {
           method: 'DELETE',
-          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}`, Prefer: 'return=representation' },
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Prefer: 'return=representation' },
         });
         showToast('Pack deleted');
         loadPacks();
@@ -508,10 +509,8 @@
 
     async function loadVersionsList() {
       try {
-        const supabaseUrl = '{{SUPABASE_URL}}';
-        const anonKey = '{{SUPABASE_ANON_KEY}}';
-        const response = await fetch(`${supabaseUrl}/rest/v1/versions?select=*,packs(name)&order=created_at.desc&limit=50`, {
-          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/versions?select=*,packs(name)&order=created_at.desc&limit=50`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
         });
         const versions = await response.json();
         const container = document.getElementById('versions-list');
@@ -557,10 +556,8 @@
     async function populatePackSelect(selectedId) {
       const select = document.getElementById('ver-pack-id');
       try {
-        const supabaseUrl = '{{SUPABASE_URL}}';
-        const anonKey = '{{SUPABASE_ANON_KEY}}';
-        const response = await fetch(`${supabaseUrl}/rest/v1/packs?select=id,name&is_published=eq.true`, {
-          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/packs?select=id,name&is_published=eq.true`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
         });
         const packs = await response.json();
         select.innerHTML = '<option value="">Select a pack...</option>' +
@@ -572,10 +569,8 @@
 
     async function editVersion(versionId) {
       try {
-        const supabaseUrl = '{{SUPABASE_URL}}';
-        const anonKey = '{{SUPABASE_ANON_KEY}}';
-        const response = await fetch(`${supabaseUrl}/rest/v1/versions?id=eq.${versionId}&limit=1`, {
-          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/versions?id=eq.${versionId}&limit=1`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
         });
         const versions = await response.json();
         const v = versions[0];
@@ -629,11 +624,9 @@
     async function deleteVersion(versionId) {
       if (!confirm('Delete this version?')) return;
       try {
-        const supabaseUrl = '{{SUPABASE_URL}}';
-        const anonKey = '{{SUPABASE_ANON_KEY}}';
-        await fetch(`${supabaseUrl}/rest/v1/versions?id=eq.${versionId}`, {
+        await fetch(`${SUPABASE_URL}/rest/v1/versions?id=eq.${versionId}`, {
           method: 'DELETE',
-          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
         });
         showToast('Version deleted');
         loadVersionsList();
@@ -651,10 +644,8 @@
     // ============================================================
     async function loadSettings() {
       try {
-        const supabaseUrl = '{{SUPABASE_URL}}';
-        const anonKey = '{{SUPABASE_ANON_KEY}}';
-        const response = await fetch(`${supabaseUrl}/rest/v1/site_settings?id=eq.global&limit=1`, {
-          headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/site_settings?id=eq.global&limit=1`, {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
         });
         const settings = await response.json();
         const s = settings[0];
