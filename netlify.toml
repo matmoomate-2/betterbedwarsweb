@@ -2,6 +2,9 @@
   functions = "netlify/functions"
   publish = "public"
 
+[build.environment]
+  SECRETS_SCAN_OMIT_PATHS = "public/admin/index.html,public/js/api.js"
+
 [functions]
   node_bundler = "esbuild"
 
